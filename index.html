@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vutienluc Docs — Any document to Markdown</title>
+    <title>Vutienluc Docs — Mọi tài liệu thành Markdown</title>
     <meta
       name="description"
-      content="Convert doc, docx, odt, rtf, epub, pdf, presentations, spreadsheets, and csv to GitHub-Flavored Markdown, entirely in your browser. Nothing is uploaded."
+      content="Chuyển đổi doc, docx, odt, rtf, epub, pdf, file trình chiếu, bảng tính và csv sang Markdown chuẩn GitHub, ngay trên trình duyệt. Không tải lên bất kỳ đâu."
     />
-    <meta property="og:title" content="Vutienluc Docs — Any document to Markdown" />
+    <meta property="og:title" content="Vutienluc Docs — Mọi tài liệu thành Markdown" />
     <meta
       property="og:description"
-      content="Drop a Word, PowerPoint, Excel, PDF, EPUB, RTF, ODT or CSV file and get clean Markdown back, instantly, in your browser. Files never leave your machine."
+      content="Thả file Word, PowerPoint, Excel, PDF, EPUB, RTF, ODT hoặc CSV vào và nhận lại Markdown sạch ngay lập tức. File không bao giờ rời khỏi máy của bạn."
     />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
@@ -431,18 +431,18 @@
           <span class="wordmark">Vutienluc Docs</span>
         </a>
         <nav>
-          <a href="https://github.com/vutluc/vutienluc-docs" id="nav-github">GitHub</a>
+          <a href="https://github.com/Vutienluc178/vutienluc-docs" id="nav-github">GitHub</a>
         </nav>
       </header>
 
       <main>
         <section class="band">
-          <h1>Any document in.<br /><span class="accent">Markdown out.</span></h1>
+          <h1>Đưa tài liệu vào.<br /><span class="accent">Nhận Markdown ra.</span></h1>
           <p class="lede">
-            Drop a Word, PowerPoint, Excel, PDF, EPUB, RTF, ODT or CSV file
-            and get clean, GitHub-Flavored Markdown back instantly.
-            <strong>Everything runs locally in your browser</strong> — files
-            are never uploaded anywhere.
+            Thả file Word, PowerPoint, Excel, PDF, EPUB, RTF, ODT hoặc CSV
+            và nhận lại Markdown sạch, chuẩn GitHub ngay lập tức.
+            <strong>Mọi thứ chạy hoàn toàn trên trình duyệt của bạn</strong> —
+            file không bao giờ được tải lên bất kỳ đâu.
           </p>
           <ul class="formats">
             <li>docx</li>
@@ -459,22 +459,22 @@
             href="https://github.com/firecrawl/anydoc"
             target="_blank"
             rel="noopener"
-            >Powered by open-source anydoc (MIT)</a
+            >Xây dựng trên nền mã nguồn mở anydoc (MIT)</a
           >
         </section>
 
         <section class="band">
           <button class="drop" id="drop" aria-describedby="drop-hint">
             <span class="big" id="drop-title"
-              >Loading the converter&hellip;</span
+              >Đang tải trình chuyển đổi&hellip;</span
             >
             <span class="small" id="drop-hint"
-              >a few MB of WebAssembly, downloaded once</span
+              >vài MB WebAssembly, chỉ tải một lần</span
             >
           </button>
           <input type="file" id="file" hidden />
           <p class="samples">
-            No document at hand? Try a sample:
+            Chưa có tài liệu sẵn? Thử file mẫu:
             <button id="sample-rtf">notes.rtf</button>
             <button id="sample-csv">report.csv</button>
           </p>
@@ -486,58 +486,60 @@
             <span class="arrow" id="result-arrow" hidden>&rarr;</span>
             <span id="result-stats"></span>
             <span class="spacer"></span>
-            <button id="copy" hidden>Copy</button>
-            <button id="download" hidden>Download .md</button>
+            <button id="copy" hidden>Sao chép</button>
+            <button id="download" hidden>Tải .md</button>
           </div>
           <pre class="output" id="output"></pre>
         </section>
 
         <section class="band">
-          <h2>About this tool</h2>
+          <h2>Về công cụ này</h2>
           <dl class="facts">
-            <dt>Privacy</dt>
+            <dt>Riêng tư</dt>
             <dd>
-              <strong>Your files never leave your device.</strong> Conversion
-              runs entirely in your browser via WebAssembly — nothing is
-              uploaded to a server, ever.
+              <strong>Tài liệu của bạn không rời khỏi thiết bị.</strong> Quá
+              trình chuyển đổi diễn ra hoàn toàn trên trình duyệt qua
+              WebAssembly — không có gì được tải lên máy chủ, không bao giờ.
             </dd>
 
-            <dt>One model</dt>
+            <dt>Một mô hình</dt>
             <dd>
-              Every format parses into the same document model and renders
-              through the same Markdown serializer, so headings, nested
-              lists, merged table cells, and footnotes come out consistent
-              no matter the source format.
+              Mọi định dạng đều được phân tích vào cùng một mô hình tài liệu
+              và hiển thị qua cùng một bộ dựng Markdown, nên tiêu đề, danh
+              sách lồng nhau, ô bảng gộp và chú thích cuối trang luôn ra kết
+              quả nhất quán, bất kể định dạng gốc là gì.
             </dd>
 
-            <dt>Detection</dt>
+            <dt>Nhận diện</dt>
             <dd>
-              The format is read from the file's bytes, not its extension,
-              so a mislabeled file still converts correctly.
+              Định dạng được đọc từ dữ liệu byte của file, không phải từ
+              phần mở rộng tên file, nên file bị đặt sai đuôi vẫn chuyển đổi
+              đúng.
             </dd>
 
-            <dt>Speed</dt>
+            <dt>Tốc độ</dt>
             <dd>
-              Pure Rust compiled to WebAssembly, no ML models, no network
-              calls: conversion typically finishes in a few milliseconds.
+              Rust thuần biên dịch sang WebAssembly, không dùng mô hình AI,
+              không gọi mạng: quá trình chuyển đổi thường hoàn tất chỉ trong
+              vài mili-giây.
             </dd>
 
             <dt>PDF</dt>
             <dd>
-              Text-based PDFs convert locally. Scanned, image-only pages
-              need OCR, which this tool does not currently perform.
+              PDF dạng văn bản chuyển đổi được ngay tại chỗ. Các trang quét
+              dạng ảnh cần OCR, tính năng mà công cụ này hiện chưa hỗ trợ.
             </dd>
           </dl>
         </section>
       </main>
 
       <footer>
-        <span>MIT license</span>
-        <a href="https://github.com/vutluc/vutienluc-docs" id="footer-github">Source</a>
+        <span>Giấy phép MIT</span>
+        <a href="https://github.com/Vutienluc178/vutienluc-docs" id="footer-github">Mã nguồn</a>
         <a href="https://github.com/firecrawl/anydoc" target="_blank" rel="noopener"
-          >Built on anydoc</a
+          >Xây dựng trên anydoc</a
         >
-        <span>&middot; Made by Tiến Lực</span>
+        <span>&middot; Thực hiện bởi Tiến Lực</span>
       </footer>
     </div>
 
@@ -575,11 +577,11 @@
           const started = performance.now();
           markdown = toMarkdownBytes(bytes, format);
           const ms = Math.max(1, Math.round(performance.now() - started));
-          const chars = markdown.length.toLocaleString('en-US');
+          const chars = markdown.length.toLocaleString('vi-VN');
           showResult(
             name,
             format,
-            `${chars} chars · ${ms} ms`,
+            `${chars} ký tự · ${ms} ms`,
             markdown,
             false,
           );
@@ -588,7 +590,7 @@
             name,
             format,
             '',
-            `Could not convert this file: ${error.message ?? error}`,
+            `Không thể chuyển đổi file này: ${error.message ?? error}`,
             true,
           );
         }
@@ -599,11 +601,11 @@
       }
 
       const SAMPLE_RTF = String.raw`{\rtf1\ansi\deff0{\fonttbl{\f0 Times New Roman;}}
-\pard\sa200 This tool reads the {\b formatting}, the {\i emphasis}, and the {\b\i structure} of a document, then writes the Markdown that says the same thing.\par
-\pard\sa200 This paragraph came from a tiny RTF file assembled right on this page. Drop one of your own to see a real conversion.\par
+\pard\sa200 Cong cu nay doc duoc {\b dinh dang}, phan {\i nhan manh}, va {\b\i cau truc} cua tai lieu, roi viet ra Markdown dien dat dieu tuong tu.\par
+\pard\sa200 Doan van nay den tu mot file RTF nho duoc tao ngay tren trang nay. Hay tha mot file that vao de xem ket qua chuyen doi.\par
 }`;
       const SAMPLE_CSV =
-        'format,kind,notes\ndocx,WordprocessingML,supported\nepub,EPUB 2 and 3,supported\nxlsx,Excel workbook,supported\npdf,text-based,supported\n';
+        'dinh_dang,loai,ghi_chu\ndocx,WordprocessingML,ho tro\nepub,EPUB 2 va 3,ho tro\nxlsx,Excel workbook,ho tro\npdf,dang van ban,ho tro\n';
 
       const drop = $('drop');
       const file = $('file');
@@ -632,9 +634,9 @@
 
       $('copy').addEventListener('click', async () => {
         await navigator.clipboard.writeText(markdown);
-        $('copy').textContent = 'Copied';
+        $('copy').textContent = 'Đã chép';
         setTimeout(() => {
-          $('copy').textContent = 'Copy';
+          $('copy').textContent = 'Sao chép';
         }, 1200);
       });
 
@@ -652,11 +654,11 @@
 
       try {
         await init();
-        dropTitle.textContent = 'Drop a document here';
+        dropTitle.textContent = 'Thả tài liệu vào đây';
         dropHint.innerHTML =
-          'or <u>browse</u> for one. Conversion happens locally, nothing is uploaded.';
+          'hoặc <u>chọn file</u>. Chuyển đổi diễn ra cục bộ, không tải lên đâu cả.';
       } catch (error) {
-        dropTitle.textContent = 'The converter failed to load';
+        dropTitle.textContent = 'Trình chuyển đổi tải thất bại';
         dropHint.textContent = String(error?.message ?? error);
       }
     </script>
