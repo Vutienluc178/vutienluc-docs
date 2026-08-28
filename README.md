@@ -4,7 +4,7 @@ Chuyển đổi file Word, PowerPoint, Excel, PDF, EPUB, RTF, ODT và CSV thành
 Markdown chuẩn GitHub — hoàn toàn ngay trên trình duyệt. Không có gì được tải
 lên máy chủ; toàn bộ quá trình chuyển đổi chạy cục bộ qua WebAssembly.
 
-**Bản chạy thử:** _(thêm URL Vercel của bạn vào đây sau khi deploy)_
+**Bản chạy thử:** https://vutienluc-docs.vercel.app
 
 ## Định dạng hỗ trợ
 
