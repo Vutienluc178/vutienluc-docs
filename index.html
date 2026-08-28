@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vutienluc Docs — Any document to Markdown</title>
+    <meta
+      name="description"
+      content="Convert doc, docx, odt, rtf, epub, pdf, presentations, spreadsheets, and csv to GitHub-Flavored Markdown, entirely in your browser. Nothing is uploaded."
+    />
+    <meta property="og:title" content="Vutienluc Docs — Any document to Markdown" />
+    <meta
+      property="og:description"
+      content="Drop a Word, PowerPoint, Excel, PDF, EPUB, RTF, ODT or CSV file and get clean Markdown back, instantly, in your browser. Files never leave your machine."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --accent: #4f46e5;
+        --accent-8: rgba(79, 70, 229, 0.08);
+        --bg: #f9f9f9;
+        --surface: #ffffff;
+        --text: #1f2328;
+        --text-muted: rgba(31, 35, 40, 0.6);
+        --alpha-4: rgba(0, 0, 0, 0.04);
+        --alpha-72: rgba(31, 35, 40, 0.72);
+        --border-faint: #ececec;
+        --border-muted: #e4e4e7;
+        --border-loud: #dcdce0;
+        --error: #d1242f;
+        --sans:
+          'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --mono:
+          ui-monospace, 'SFMono-Regular', 'Cascadia Code', Menlo, Consolas,
+          monospace;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b0b0d;
+          --surface: #161618;
+          --text: #f2f2f3;
+          --text-muted: rgba(255, 255, 255, 0.58);
+          --alpha-4: rgba(255, 255, 255, 0.04);
+          --alpha-72: rgba(255, 255, 255, 0.72);
+          --border-faint: #29292c;
+          --border-muted: #333336;
+          --border-loud: #3f3f43;
+          --error: #ff7b72;
+          --accent: #818cf8;
+          --accent-8: rgba(129, 140, 248, 0.1);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      .page {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      a {
+        color: inherit;
+      }
+      a:hover {
+        color: var(--accent);
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+      }
+
+      header.top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 26px 4px;
+        border-bottom: 1px solid var(--border-faint);
+      }
+      .lockup {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        text-decoration: none;
+      }
+      .lockup .mark {
+        height: 26px;
+        width: 26px;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: -0.02em;
+      }
+      .lockup .wordmark {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: var(--text);
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px 16px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      nav a {
+        color: var(--text-muted);
+        text-decoration: none;
+      }
+
+      main {
+        padding: 8px 4px 40px;
+      }
+
+      section.band {
+        padding: 32px 0;
+      }
+      section.band + section.band {
+        border-top: 1px solid var(--border-faint);
+      }
+      @media (max-width: 575px) {
+        header.top {
+          padding: 20px 4px;
+        }
+      }
+
+      h1 {
+        margin: 0 0 16px;
+        font-size: clamp(32px, 6vw, 48px);
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        font-weight: 700;
+      }
+      h1 .accent {
+        color: var(--accent);
+      }
+      h2 {
+        margin: 0 0 12px;
+        font-size: 19px;
+        line-height: 26px;
+        letter-spacing: -0.01em;
+        font-weight: 600;
+      }
+      .lede {
+        color: var(--alpha-72);
+        font-size: 16px;
+        line-height: 24px;
+        max-width: 60ch;
+        margin: 0;
+      }
+      .lede strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      .powered {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 22px;
+        padding: 5px 10px;
+        border: 1px solid var(--border-muted);
+        border-radius: 999px;
+        background: var(--surface);
+        font-size: 12.5px;
+        color: var(--text-muted);
+        text-decoration: none;
+      }
+      .powered:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .formats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 18px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .formats li {
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 3px 9px;
+        border: 1px solid var(--border-muted);
+        border-radius: 6px;
+        color: var(--text-muted);
+        background: var(--surface);
+      }
+
+      /* Converter */
+      .drop {
+        width: 100%;
+        border: 1.5px dashed var(--border-loud);
+        border-radius: 14px;
+        background: var(--surface);
+        padding: 44px 24px;
+        text-align: center;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+      }
+      .drop:hover,
+      .drop.over {
+        border-color: var(--accent);
+        background: var(--accent-8);
+      }
+      .drop .big {
+        display: block;
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+      .drop .small {
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+      .drop .small u {
+        text-decoration-color: var(--accent);
+        text-underline-offset: 3px;
+      }
+
+      .samples {
+        margin: 14px 0 0;
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+      .samples button {
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--surface);
+        border: 1px solid var(--border-loud);
+        border-radius: 8px;
+        padding: 4px 10px;
+        cursor: pointer;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .samples button:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .result[hidden] {
+        display: none;
+      }
+      .result-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      .result-bar .name {
+        color: var(--text);
+        font-weight: 500;
+        overflow-wrap: anywhere;
+      }
+      .result-bar .arrow {
+        color: var(--accent);
+      }
+      .result-bar .spacer {
+        flex: 1;
+      }
+      .result-bar button {
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 500;
+        background: var(--surface);
+        border: 1px solid var(--border-loud);
+        border-radius: 8px;
+        padding: 4px 12px;
+        cursor: pointer;
+        transition:
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .result-bar button:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      pre.output {
+        margin: 0;
+        background: var(--surface);
+        border: 1px solid var(--border-faint);
+        border-radius: 12px;
+        padding: 20px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 20px;
+        overflow: auto;
+        max-height: 60vh;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      pre.output.error {
+        color: var(--error);
+      }
+
+      .prose {
+        margin: 0;
+        color: var(--alpha-72);
+        font-size: 15px;
+        line-height: 24px;
+        max-width: 70ch;
+      }
+      .prose + .prose {
+        margin-top: 12px;
+      }
+      .prose strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      .facts {
+        display: grid;
+        grid-template-columns: 108px 1fr;
+        margin: 0;
+      }
+      .facts dt,
+      .facts dd {
+        padding: 12px 0;
+        border-top: 1px solid var(--border-faint);
+      }
+      .facts dt:first-of-type,
+      .facts dt:first-of-type + dd {
+        padding-top: 0;
+        border-top: 0;
+      }
+      .facts dt {
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .facts dd {
+        margin: 0;
+        color: var(--alpha-72);
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.14px;
+        max-width: 68ch;
+      }
+      .facts dd strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+      @media (max-width: 575px) {
+        .facts {
+          grid-template-columns: 1fr;
+        }
+        .facts dt {
+          padding-bottom: 2px;
+        }
+        .facts dd {
+          padding-top: 0;
+          border-top: 0;
+        }
+      }
+
+      footer {
+        padding: 26px 4px;
+        border-top: 1px solid var(--border-faint);
+        color: var(--text-muted);
+        font-size: 13px;
+        line-height: 20px;
+        font-weight: 500;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 18px;
+      }
+      footer a {
+        text-decoration: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="lockup" href="/" aria-label="Vutienluc Docs">
+          <span class="mark">V</span>
+          <span class="wordmark">Vutienluc Docs</span>
+        </a>
+        <nav>
+          <a href="https://github.com/vutluc/vutienluc-docs" id="nav-github">GitHub</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="band">
+          <h1>Any document in.<br /><span class="accent">Markdown out.</span></h1>
+          <p class="lede">
+            Drop a Word, PowerPoint, Excel, PDF, EPUB, RTF, ODT or CSV file
+            and get clean, GitHub-Flavored Markdown back instantly.
+            <strong>Everything runs locally in your browser</strong> — files
+            are never uploaded anywhere.
+          </p>
+          <ul class="formats">
+            <li>docx</li>
+            <li>pptx</li>
+            <li>xlsx</li>
+            <li>odt</li>
+            <li>rtf</li>
+            <li>epub</li>
+            <li>pdf</li>
+            <li>csv</li>
+          </ul>
+          <a
+            class="powered"
+            href="https://github.com/firecrawl/anydoc"
+            target="_blank"
+            rel="noopener"
+            >Powered by open-source anydoc (MIT)</a
+          >
+        </section>
+
+        <section class="band">
+          <button class="drop" id="drop" aria-describedby="drop-hint">
+            <span class="big" id="drop-title"
+              >Loading the converter&hellip;</span
+            >
+            <span class="small" id="drop-hint"
+              >a few MB of WebAssembly, downloaded once</span
+            >
+          </button>
+          <input type="file" id="file" hidden />
+          <p class="samples">
+            No document at hand? Try a sample:
+            <button id="sample-rtf">notes.rtf</button>
+            <button id="sample-csv">report.csv</button>
+          </p>
+        </section>
+
+        <section class="band result" id="result" hidden aria-live="polite">
+          <div class="result-bar">
+            <span class="name" id="result-name"></span>
+            <span class="arrow" id="result-arrow" hidden>&rarr;</span>
+            <span id="result-stats"></span>
+            <span class="spacer"></span>
+            <button id="copy" hidden>Copy</button>
+            <button id="download" hidden>Download .md</button>
+          </div>
+          <pre class="output" id="output"></pre>
+        </section>
+
+        <section class="band">
+          <h2>About this tool</h2>
+          <dl class="facts">
+            <dt>Privacy</dt>
+            <dd>
+              <strong>Your files never leave your device.</strong> Conversion
+              runs entirely in your browser via WebAssembly — nothing is
+              uploaded to a server, ever.
+            </dd>
+
+            <dt>One model</dt>
+            <dd>
+              Every format parses into the same document model and renders
+              through the same Markdown serializer, so headings, nested
+              lists, merged table cells, and footnotes come out consistent
+              no matter the source format.
+            </dd>
+
+            <dt>Detection</dt>
+            <dd>
+              The format is read from the file's bytes, not its extension,
+              so a mislabeled file still converts correctly.
+            </dd>
+
+            <dt>Speed</dt>
+            <dd>
+              Pure Rust compiled to WebAssembly, no ML models, no network
+              calls: conversion typically finishes in a few milliseconds.
+            </dd>
+
+            <dt>PDF</dt>
+            <dd>
+              Text-based PDFs convert locally. Scanned, image-only pages
+              need OCR, which this tool does not currently perform.
+            </dd>
+          </dl>
+        </section>
+      </main>
+
+      <footer>
+        <span>MIT license</span>
+        <a href="https://github.com/vutluc/vutienluc-docs" id="footer-github">Source</a>
+        <a href="https://github.com/firecrawl/anydoc" target="_blank" rel="noopener"
+          >Built on anydoc</a
+        >
+        <span>&middot; Made by Tiến Lực</span>
+      </footer>
+    </div>
+
+    <script type="module">
+      import init, {
+        formatFromBytes,
+        formatFromPath,
+        toMarkdownBytes,
+      } from '@firecrawl/anydoc-wasm';
+
+      const $ = (id) => document.getElementById(id);
+      const dropTitle = $('drop-title');
+      const dropHint = $('drop-hint');
+      const output = $('output');
+
+      let markdown = '';
+      let baseName = 'document';
+
+      function showResult(name, format, stats, text, isError) {
+        $('result').hidden = false;
+        $('result-name').textContent = name;
+        $('result-arrow').hidden = isError;
+        $('result-stats').textContent = isError ? '' : `${format} · ${stats}`;
+        $('copy').hidden = isError;
+        $('download').hidden = isError;
+        output.textContent = text;
+        output.classList.toggle('error', isError);
+        $('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function convert(name, bytes) {
+        const format = formatFromBytes(bytes) ?? formatFromPath(name);
+        baseName = name.replace(/\.[^.]*$/, '') || 'document';
+        try {
+          const started = performance.now();
+          markdown = toMarkdownBytes(bytes, format);
+          const ms = Math.max(1, Math.round(performance.now() - started));
+          const chars = markdown.length.toLocaleString('en-US');
+          showResult(
+            name,
+            format,
+            `${chars} chars · ${ms} ms`,
+            markdown,
+            false,
+          );
+        } catch (error) {
+          showResult(
+            name,
+            format,
+            '',
+            `Could not convert this file: ${error.message ?? error}`,
+            true,
+          );
+        }
+      }
+
+      async function convertFile(file) {
+        convert(file.name, new Uint8Array(await file.arrayBuffer()));
+      }
+
+      const SAMPLE_RTF = String.raw`{\rtf1\ansi\deff0{\fonttbl{\f0 Times New Roman;}}
+\pard\sa200 This tool reads the {\b formatting}, the {\i emphasis}, and the {\b\i structure} of a document, then writes the Markdown that says the same thing.\par
+\pard\sa200 This paragraph came from a tiny RTF file assembled right on this page. Drop one of your own to see a real conversion.\par
+}`;
+      const SAMPLE_CSV =
+        'format,kind,notes\ndocx,WordprocessingML,supported\nepub,EPUB 2 and 3,supported\nxlsx,Excel workbook,supported\npdf,text-based,supported\n';
+
+      const drop = $('drop');
+      const file = $('file');
+      drop.addEventListener('click', () => file.click());
+      file.addEventListener('change', () => {
+        if (file.files[0]) convertFile(file.files[0]);
+      });
+
+      for (const eventName of ['dragover', 'drop']) {
+        window.addEventListener(eventName, (event) => event.preventDefault());
+      }
+      drop.addEventListener('dragover', () => drop.classList.add('over'));
+      drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+      drop.addEventListener('drop', (event) => {
+        drop.classList.remove('over');
+        const dropped = event.dataTransfer?.files?.[0];
+        if (dropped) convertFile(dropped);
+      });
+
+      $('sample-rtf').addEventListener('click', () =>
+        convert('notes.rtf', new TextEncoder().encode(SAMPLE_RTF)),
+      );
+      $('sample-csv').addEventListener('click', () =>
+        convert('report.csv', new TextEncoder().encode(SAMPLE_CSV)),
+      );
+
+      $('copy').addEventListener('click', async () => {
+        await navigator.clipboard.writeText(markdown);
+        $('copy').textContent = 'Copied';
+        setTimeout(() => {
+          $('copy').textContent = 'Copy';
+        }, 1200);
+      });
+
+      $('download').addEventListener('click', () => {
+        const url = URL.createObjectURL(
+          new Blob([markdown], { type: 'text/markdown' }),
+        );
+        const a = Object.assign(document.createElement('a'), {
+          href: url,
+          download: `${baseName}.md`,
+        });
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      try {
+        await init();
+        dropTitle.textContent = 'Drop a document here';
+        dropHint.innerHTML =
+          'or <u>browse</u> for one. Conversion happens locally, nothing is uploaded.';
+      } catch (error) {
+        dropTitle.textContent = 'The converter failed to load';
+        dropHint.textContent = String(error?.message ?? error);
+      }
+    </script>
+  </body>
+</html>
