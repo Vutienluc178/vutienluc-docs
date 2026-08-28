@@ -280,6 +280,84 @@
         color: var(--accent);
       }
 
+      .mathpix {
+        margin-top: 16px;
+        border: 1px solid var(--border-muted);
+        border-radius: 12px;
+        background: var(--surface);
+        padding: 4px 16px;
+      }
+      .mathpix summary {
+        cursor: pointer;
+        padding: 12px 0;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--text-muted);
+        list-style: none;
+      }
+      .mathpix summary::-webkit-details-marker {
+        display: none;
+      }
+      .mathpix summary::before {
+        content: '▸';
+        display: inline-block;
+        margin-right: 8px;
+        color: var(--accent);
+        transition: transform 0.15s;
+      }
+      .mathpix[open] summary::before {
+        transform: rotate(90deg);
+      }
+      .mathpix summary:hover {
+        color: var(--text);
+      }
+      .mathpix-body {
+        padding: 0 0 16px;
+      }
+      .field {
+        display: block;
+        margin-top: 12px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+      .field input {
+        display: block;
+        width: 100%;
+        margin-top: 5px;
+        padding: 8px 10px;
+        font: inherit;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--text);
+        background: var(--bg);
+        border: 1px solid var(--border-loud);
+        border-radius: 8px;
+      }
+      .field input:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+      .checkbox-field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        font-size: 13.5px;
+        font-weight: 500;
+      }
+      .checkbox-field input {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--accent);
+      }
+      .mathpix-status {
+        margin: 10px 0 0;
+        font-size: 12.5px;
+        color: var(--text-muted);
+        min-height: 1.2em;
+      }
+
       .result[hidden] {
         display: none;
       }
@@ -478,6 +556,43 @@
             <button id="sample-rtf">notes.rtf</button>
             <button id="sample-csv">report.csv</button>
           </p>
+
+          <details class="mathpix">
+            <summary>Nhận diện công thức toán (LaTeX) cho PDF — tuỳ chọn, qua Mathpix</summary>
+            <div class="mathpix-body">
+              <p class="prose">
+                Mặc định, trình chuyển đổi chạy 100% trong trình duyệt và không
+                nhận diện công thức toán trong PDF (công thức sẽ ra ký hiệu lộn
+                xộn thay vì LaTeX). Để bật nhận diện công thức toán, tạo tài
+                khoản tại
+                <a href="https://mathpix.com" target="_blank" rel="noopener"
+                  >mathpix.com</a
+                >
+                (có phí theo trang), lấy <strong>App ID</strong> và
+                <strong>App Key</strong> rồi nhập bên dưới.
+              </p>
+              <p class="prose">
+                <strong>Lưu ý:</strong> khi bật, file PDF của bạn sẽ được gửi
+                qua máy chủ của trang này đến Mathpix để xử lý — không còn
+                chạy cục bộ nữa. App ID/App Key chỉ lưu trong trình duyệt của
+                bạn (localStorage), trang này không lưu hay nhìn thấy chúng.
+                PDF nên nhỏ hơn khoảng 4&nbsp;MB do giới hạn của Vercel.
+              </p>
+              <label class="field"
+                >App ID
+                <input type="text" id="mathpix-app-id" autocomplete="off" spellcheck="false"
+              /></label>
+              <label class="field"
+                >App Key
+                <input type="password" id="mathpix-app-key" autocomplete="off" spellcheck="false"
+              /></label>
+              <label class="checkbox-field">
+                <input type="checkbox" id="mathpix-enabled" />
+                Bật OCR công thức toán cho file PDF
+              </label>
+              <p class="mathpix-status" id="mathpix-save-status" aria-live="polite"></p>
+            </div>
+          </details>
         </section>
 
         <section class="band result" id="result" hidden aria-live="polite">
@@ -526,8 +641,12 @@
 
             <dt>PDF</dt>
             <dd>
-              PDF dạng văn bản chuyển đổi được ngay tại chỗ. Các trang quét
-              dạng ảnh cần OCR, tính năng mà công cụ này hiện chưa hỗ trợ.
+              PDF dạng văn bản chuyển đổi được ngay tại chỗ. Công thức toán
+              trong PDF thường không phải là text thật nên mặc định sẽ ra ký
+              hiệu lộn xộn — bật mục "Nhận diện công thức toán" phía trên (qua
+              Mathpix, cần tài khoản riêng) nếu cần LaTeX sạch. Trang quét
+              dạng ảnh vẫn cần OCR văn bản thường, tính năng mà công cụ này
+              hiện chưa hỗ trợ.
             </dd>
           </dl>
         </section>
@@ -596,8 +715,141 @@
         }
       }
 
+      const mpAppIdEl = $('mathpix-app-id');
+      const mpAppKeyEl = $('mathpix-app-key');
+      const mpEnabledEl = $('mathpix-enabled');
+      const mpStatusEl = $('mathpix-save-status');
+
+      try {
+        mpAppIdEl.value = localStorage.getItem('mathpixAppId') || '';
+        mpAppKeyEl.value = localStorage.getItem('mathpixAppKey') || '';
+        mpEnabledEl.checked = localStorage.getItem('mathpixEnabled') === '1';
+      } catch {
+        // localStorage unavailable (private mode, etc.) — settings just won't persist.
+      }
+
+      function saveMathpixSettings() {
+        try {
+          localStorage.setItem('mathpixAppId', mpAppIdEl.value.trim());
+          localStorage.setItem('mathpixAppKey', mpAppKeyEl.value.trim());
+          localStorage.setItem('mathpixEnabled', mpEnabledEl.checked ? '1' : '0');
+          mpStatusEl.textContent = 'Đã lưu trên trình duyệt này.';
+          setTimeout(() => {
+            mpStatusEl.textContent = '';
+          }, 1500);
+        } catch {
+          // Ignore — nothing we can do if storage is blocked.
+        }
+      }
+      mpAppIdEl.addEventListener('change', saveMathpixSettings);
+      mpAppKeyEl.addEventListener('change', saveMathpixSettings);
+      mpEnabledEl.addEventListener('change', saveMathpixSettings);
+
+      async function convertViaMathpix(file, format, appId, appKey) {
+        baseName = file.name.replace(/\.[^.]*$/, '') || 'document';
+        $('result').hidden = false;
+        $('result-name').textContent = file.name;
+        $('result-arrow').hidden = true;
+        $('result-stats').textContent = '';
+        $('copy').hidden = true;
+        $('download').hidden = true;
+        output.classList.remove('error');
+        output.textContent = 'Đang gửi PDF tới Mathpix để nhận diện công thức toán…';
+        $('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        const startedAt = Date.now();
+        try {
+          const bytes = new Uint8Array(await file.arrayBuffer());
+          let binary = '';
+          for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+          const fileBase64 = btoa(binary);
+
+          const submitRes = await fetch('/api/mathpix-submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              app_id: appId,
+              app_key: appKey,
+              filename: file.name,
+              fileBase64,
+            }),
+          });
+          const submitData = await submitRes.json().catch(() => ({}));
+          if (!submitRes.ok || !submitData.pdf_id) {
+            throw new Error(
+              submitData?.error?.message ||
+                submitData?.error ||
+                'Gửi file lên Mathpix thất bại.',
+            );
+          }
+          const pdfId = submitData.pdf_id;
+
+          const timeoutMs = 120000;
+          let status = 'processing';
+          while (Date.now() - startedAt < timeoutMs) {
+            output.textContent = `Mathpix đang xử lý… (${Math.round((Date.now() - startedAt) / 1000)}s)`;
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+            const statusRes = await fetch(
+              `/api/mathpix-status?pdf_id=${encodeURIComponent(pdfId)}&app_id=${encodeURIComponent(appId)}&app_key=${encodeURIComponent(appKey)}`,
+            );
+            const statusData = await statusRes.json().catch(() => ({}));
+            status = statusData.status;
+            if (status === 'completed') break;
+            if (status === 'error') {
+              throw new Error(
+                statusData?.error_info?.message || 'Mathpix báo lỗi khi xử lý file.',
+              );
+            }
+          }
+          if (status !== 'completed') {
+            throw new Error(
+              'Quá thời gian chờ Mathpix xử lý (2 phút). Thử lại với file nhỏ hơn.',
+            );
+          }
+
+          const resultRes = await fetch(
+            `/api/mathpix-result?pdf_id=${encodeURIComponent(pdfId)}&ext=md&app_id=${encodeURIComponent(appId)}&app_key=${encodeURIComponent(appKey)}`,
+          );
+          const text = await resultRes.text();
+          if (!resultRes.ok) throw new Error('Không tải được kết quả từ Mathpix.');
+
+          markdown = text;
+          const totalS = Math.round((Date.now() - startedAt) / 1000);
+          const chars = markdown.length.toLocaleString('vi-VN');
+          showResult(file.name, 'pdf (Mathpix)', `${chars} ký tự · ${totalS}s`, markdown, false);
+        } catch (error) {
+          showResult(
+            file.name,
+            format,
+            '',
+            `Lỗi khi dùng Mathpix: ${error.message ?? error}`,
+            true,
+          );
+        }
+      }
+
       async function convertFile(file) {
-        convert(file.name, new Uint8Array(await file.arrayBuffer()));
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const format = formatFromBytes(bytes) ?? formatFromPath(file.name);
+
+        if (format === 'pdf' && mpEnabledEl.checked) {
+          const appId = mpAppIdEl.value.trim();
+          const appKey = mpAppKeyEl.value.trim();
+          if (!appId || !appKey) {
+            showResult(
+              file.name,
+              format,
+              '',
+              'Bạn đã bật OCR công thức toán nhưng chưa nhập App ID/App Key của Mathpix ở mục cài đặt phía trên.',
+              true,
+            );
+            return;
+          }
+          await convertViaMathpix(file, format, appId, appKey);
+          return;
+        }
+
+        convert(file.name, bytes);
       }
 
       const SAMPLE_RTF = String.raw`{\rtf1\ansi\deff0{\fonttbl{\f0 Times New Roman;}}
